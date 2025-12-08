@@ -1,0 +1,105 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark py-2">
+  <div class="container">
+
+    <!-- Brand -->
+    <a class="navbar-brand fw-bold text-muted" href="/">Drone Cam</a>
+
+    <!-- Toggle for mobile -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+
+      <!-- LEFT MENU -->
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+        <!-- <li class="nav-item"><a class="nav-link" href="/live">Live Video</a></li> -->
+        <li class="nav-item"><a class="nav-link" href="/list">Devices</a></li>
+        <li class="nav-item"><a class="nav-link" href="/videos">File Record</a></li>
+        <li class="nav-item"><a class="nav-link" href="/about">About Us</a></li>
+      </ul>
+
+      <!-- RIGHT MENU -->
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+
+        <!-- Toggle Dark Mode -->
+        <li class="nav-item me-3">
+          <button id="themeToggle" class="btn btn-outline-light btn-sm">
+            <i id="themeIcon" class="bi bi-moon"></i>
+          </button>
+        </li>
+        
+        <li class="nav-item me-3">|</li>
+
+        <% if (session && session.user) { %>
+        <!-- USER DROPDOWN -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" data-bs-toggle="dropdown">
+            <i class="bi bi-person-circle me-1"></i>
+            <%= session.user.username %>
+          </a>
+
+          <ul class="dropdown-menu dropdown-menu-end shadow">
+            <li><a class="dropdown-item" href="#"><i class="bi bi-person-circle"> Profile </i></a></li>
+            <li><a class="dropdown-item" href="/scan"> <i class="bi bi-search"></i> Scan Cameras</i></a></li>
+            <li><a class="dropdown-item" href="/add-streaming"> <i class="bi bi-people"> Create Streaming</i></a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item text-danger" href="#" id="logoutBtn">
+                <i class="bi bi-box-arrow-right"> Logout </i>
+              </a>
+            </li>
+          </ul>
+        </li>
+        <% } %>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+<!-- Logout -->
+ <script>
+document.getElementById("logoutBtn").addEventListener("click", function(e) {
+  e.preventDefault();
+
+  Swal.fire({
+    title: "",
+    text: "Anda yakin ingin logout?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Ya, Logout"
+  }).then((result) => {
+    if (result.isConfirmed) {
+      window.location.href = "/logout";
+    }
+  });
+});
+</script>
+
+<!-- DARK MODE SCRIPT -->
+<script>
+  const toggleBtn = document.getElementById("themeToggle");
+  const themeIcon = document.getElementById("themeIcon");
+
+  // Load saved theme
+  if (localStorage.getItem("theme") === "light") {
+    document.body.classList.add("light-mode");
+    themeIcon.classList.replace("bi-moon", "bi-brightness-high");
+  }
+
+  toggleBtn.addEventListener("click", () => {
+    document.body.classList.toggle("light-mode");
+
+    if (document.body.classList.contains("light-mode")) {
+      localStorage.setItem("theme", "light");
+      themeIcon.classList.replace("bi-moon", "bi-brightness-high");
+    } else {
+      localStorage.setItem("theme", "dark");
+      themeIcon.classList.replace("bi-brightness-high", "bi-moon");
+    }
+  });
+</script>
+

@@ -1,0 +1,208 @@
+/* ==== GLOBAL ==== */
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(120deg, #2a2a2a, #111111);
+    transition: background 0.3s ease, color 0.3s ease;
+    margin: 20px;
+}
+
+.img-offline {
+    max-width: 40%;
+    height: auto;
+    border-radius: 10px;
+    display: block;
+    margin: 0 auto;
+}
+
+/* ==== LIGHT MODE ==== */
+.light-mode {
+    background: #f8f9fa !important;
+    color: #212529 !important;
+}
+.light-mode .navbar {
+    background: #ffffff !important;
+    border-bottom: 1px solid #ddd;
+}
+.light-mode .navbar .nav-link {
+    color: #212529 !important;
+}
+.light-mode .dropdown-menu {
+    background: #ffffff !important;
+}
+.light-mode .dropdown-item:hover {
+    background: #eaeaea !important;
+}
+
+/* ==== GRID STREAMING ==== */
+/* Container grid JANGAN pakai 1fr biar card tidak melebar */
+#grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 520px));
+    gap: 22px;
+    padding: 10px;
+    justify-content: center;
+}
+
+/* ==== CARD CAMERA (glassmorphism 1x aja, tanpa duplikat) ==== */
+.cam {
+    backdrop-filter: blur(14px) saturate(180%);
+    -webkit-backdrop-filter: blur(14px) saturate(180%);
+    background: rgba(10, 10, 20, 0.55);
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 14px;
+
+    box-shadow: 0 0 18px rgba(0,255,255,0.25),
+                inset 0 0 8px rgba(0,200,255,0.2);
+    transition: transform 0.2s ease-in-out;
+
+    max-width: 520px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.cam:hover {
+    transform: scale(1.02);
+}
+
+/* ==== TITLE CARD ==== */
+.cam h3 {
+    font-size: 18px;
+    font-weight: 700;
+    background: linear-gradient(90deg, #0ff, #05f, #f0f, #0ff);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: neonMove 5s linear infinite;
+    margin-bottom: 10px;
+}
+
+@keyframes neonMove {
+  0% { background-position: 0% 50% }
+  100% { background-position: 300% 50% }
+}
+
+/* ==== AREA STREAMING VIDEO ==== */
+.canvas-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 500px; /* untuk video agak lebih kecil dari card */
+    margin: 0 auto;
+    height: 180px;
+    background: black;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(0,255,255,0.2);
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* ==== LOADING OVERLAY ==== */
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  background: rgba(0,0,0,0.7);
+  color: cyan;
+  z-index: 2;
+}
+
+/* ==== LIVE INDICATOR ==== */
+.live-indicator {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  background: rgba(0,255,255,0.15);
+  border: 1px solid rgba(0,255,255,0.35);
+  color: #0ff;
+  box-shadow: 0 0 10px #0ff, inset 0 0 4px #0ff;
+}
+
+/* ==== REC INDICATOR ==== */
+.rec-indicator {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  background: rgba(255,0,0,0.15);
+  border: 1px solid rgba(255,0,0,0.35);
+  color: #f66;
+  box-shadow: 0 0 10px #f00, inset 0 0 4px #f00;
+  animation: recPulse 1.3s infinite alternate;
+}
+
+@keyframes recPulse {
+  0% { opacity: 0.6; transform: scale(0.95) }
+  100% { opacity: 1; transform: scale(1.05) }
+}
+
+/* ==== BUTTON AREA ==== */
+.actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+  justify-content: center;
+  width: 100%;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.actions button {
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  min-width: 110px;
+}
+
+.actions button:hover:not(:disabled) {
+  filter: brightness(1.2);
+}
+
+.actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ==== BUTTON WARNA ==== */
+#btn-preview, #btn-preview-* {
+  background: #17bf17;
+  color: white;
+}
+#btn-stop, #btn-stop-* {
+  background: #1e0606;
+  color: white;
+}
+#btn-rec, #btn-rec-* {
+  background: #c51616;
+  color: white;
+}
+#btn-stoprec, #btn-stoprec-* {
+  background: #ffcccc;
+  color: #800;
+}

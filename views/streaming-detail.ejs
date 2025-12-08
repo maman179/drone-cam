@@ -1,0 +1,32 @@
+<!-- <h3 class="text-muted mb-3">Add Group</h3> -->
+
+<form action="/stream/<%= stream._id %>/add-group" method="POST" style="max-width: 400px" class="p-4 bg-dark rounded">
+
+  <!-- Nama Group -->
+  <div class="mb-3">
+    <label class="text-white">Nama Group</label>
+    <input type="text" name="name" class="form-control" style="max-width: 400px" required>
+  </div>
+
+  <!-- Deskripsi -->
+  <div class="mb-3">
+    <label class="text-white">Deskripsi</label>
+    <input type="text" name="description" class="form-control" style="max-width: 400px">
+  </div>
+
+  <!-- Pilih Kamera -->
+  <div class="mb-3">
+    <label class="text-white">Pilih Kamera</label>
+    <select class="form-select" name="cameraIds" style="max-width: 400px" required>
+      <% cameras.forEach(cam => { %>
+        <option value="<%= cam._id %>">
+          <%= cam.name %> - <%= cam.ip %>
+        </option>
+      <% }) %>
+    </select>
+  </div>
+
+  <button type="submit" class="btn btn-outline-primary">Add Group</button>
+  <a class="btn btn-outline-danger" href="/">Cancel</a>
+
+</form>

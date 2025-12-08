@@ -1,0 +1,92 @@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  // Ambil username dari session EJS
+  const USERNAME = "<%= session.user.username %>";
+</script>
+
+<div class="container mt-4">
+  <h1 class="text-center text-muted mt-4">My Recordings</h1>
+  <div id="video-list" class="row g-3"></div>
+</div>
+
+<script>
+async function loadVideos() {
+  const res = await fetch("/api/videos", { credentials: "include" });
+
+  if (res.status === 401) {
+    Swal.fire("Not Login!", "Silakan login ulang.", "error");
+    return;
+  }
+
+  const videos = await res.json();
+  const list = document.getElementById("video-list");
+
+  if (videos.length === 0) {
+    list.innerHTML = `
+      <div class="col-12 text-center">
+        <img src="/img/drone-bg-white.png" width="250">
+        <p class="text-muted mt-2">Records Not Found</p>
+      </div>
+    `;
+    return;
+  }
+
+  list.innerHTML = videos.map(v => `
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+
+        <video src="/records/${USERNAME}/${v}"
+               class="card-img-top"
+               controls></video>
+
+        <div class="card-body">
+          <h6 class="text-center">${v}</h6>
+
+          <div class="text-center mt-2">
+            <a href="/records/${USERNAME}/${v}" download class="btn btn-primary btn-sm">
+              <i class="bi bi-cloud-download"></i> Download
+            </a>
+            <button onclick="deleteVideo('${v}')" class="btn btn-danger btn-sm">
+              <i class="bi bi-trash"></i> Delete
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  `).join('');
+}
+
+function deleteVideo(file) {
+  Swal.fire({
+    title: "Hapus?",
+    text: `Yakin ingin hapus ${file}?`,
+    icon: "warning",
+    showCancelButton: true
+  }).then(result => {
+    if (!result.isConfirmed) return;
+    fetch(`/api/videos/${USERNAME}/${file}`, {
+      method: "DELETE",
+      credentials: "include"
+    })
+    .then(r => r.json())
+    .then (data => {
+      if (data.success) {      
+          Swal.fire({
+          icon : 'success',
+          title : 'Berhasil', 
+          text : 'Video Sukses dihapus',
+          timer: 2000,
+          showConfirmButton: false});
+        loadVideos();
+      } else {
+         Swal.fire("Error", data.error, "error");
+      }
+    })
+    .then(() => loadVideos());
+  });
+}
+
+loadVideos();
+</script>

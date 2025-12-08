@@ -1,0 +1,54 @@
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-md-6">
+            <h2 class="text-center">Form Ubah Camera</h2>
+            <% if (typeof errors !='undefined') { %>
+             <div class="alert alert-danger" role="alert">
+                    <ul>
+                        <% errors.forEach(error => { %>
+                            <li><%= error.msg %></li>
+                        <% }) %>
+                    </ul>
+            </div>
+            <% }  %> 
+                
+<form method="post" action="/camera/update?_method=PUT">
+  <input type="hidden" name="_id" value="<%= camera._id %>">
+ <input type="hidden" name="oldIp" value="<%= camera.ip %>">
+
+  <div class="mb-3">
+    <label for="nama" class="form-label">Masukan Nama Camera</label>
+    <input type="hidden" class="form-control" id="id_cam"  name="id" value= "<%= camera.id %>" required>
+    <input type="hidden" class="form-control" id="oldName"  name="oldName" value= "<%= (camera.oldName) || camera.name %>" required>
+    <input type="text" class="form-control" id="name"  name="name" value= "<%= camera.name %>" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="nama" class="form-label">Masukan IP Camera</label>
+    <input type="text" class="form-control" id="ip"  name="ip" value= "<%= camera.ip %>" required>
+  </div>
+  
+  <div class="mb-3">
+    <label for="nama" class="form-label">Port</label>
+    <input type="text" class="form-control" id="port"  name="port" value= "<%= camera.port %>" required>
+  </div>
+  
+  <div class="mb-3">
+    <label for="nama" class="form-label">Masukan Username</label>
+    <input type="text" class="form-control" id="username"  name="username" value= "<%= camera.username %>">
+  </div>
+
+  <div class="mb-3">
+    <label for="nama" class="form-label">Masukan Password</label>
+    <input type="text" class="form-control" id="password"  name="password" value= "<%= camera.password %>" >
+    <input type="hidden" class="form-control" id="rtsp"  name="rtsp" value= "<%= camera.rtsp %>" required>
+    <input type="hidden" class="form-control" id="rtsp1"  name="rtsp1" value= "<%= camera.rtsp1 %>" required>
+  </div>
+
+
+  <button type="submit" class="btn btn-success">Ubah Data</button>
+  <a href = "/" class="btn btn-danger">Cancel</a>
+</form>
+        </div>
+    </div>
+</div>

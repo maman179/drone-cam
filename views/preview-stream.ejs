@@ -1,0 +1,15 @@
+<% if (stream.groups.length < 1) { %>
+        <div id ="no-camera" class="p-4 text-center">
+          <h2 class="text-muted">Streaming Not Found<img src="/img/drone-bg-white.png" class="img-offline"></h4>
+        </div>
+      <% } else { %>
+<!-- <h2 class="text-center">Monitoring CCTV</h2> -->
+<div class="grid mt-4">
+    <!-- Tombol opsional -->
+</div>
+
+    <!-- GRID -->
+    <div id="grid" class="grid mt-3"></div>
+  <!-- Script HARUS di luar grid -->
+    <script src="/js/group.js"></script>
+<% } %>

@@ -1,0 +1,13 @@
+[
+  {
+    "name": "IP-camera",
+    "ip": "10.20.88.6",
+    "username": "admin",
+    "password": "admin123",
+    "SerialNumber": "VE6749087FTCW",
+    "FirmwareVersion": "2.4",
+    "rtsp": "rtsp://admin:admin123@10.20.88.6:10554/tcp/av0_1",
+    "rtsp1": "rtsp://admin:admin123@10.20.88.6:10554/tcp/av0_0",
+    "id": "1"
+  }
+]

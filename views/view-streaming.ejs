@@ -1,0 +1,61 @@
+ <% if (msg.length !== 0) { %>
+        <script>
+          Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: '<%= msg %>',
+            customClass: {
+               popup: 'swal-small'
+            },
+            timer: 2000,
+            showConfirmButton: false
+          });
+        </script>
+      <% } %>
+      
+ <% if (Stream.groups.length < 1) { %>
+        <div id ="no-camera" class="p-4 text-center">
+          <h2 class="text-muted">Group Not Found<img src="/img/drone-bg-white.png" class="img-offline"></h4>
+        </div>
+      <% } else { %>
+<div class="container-fluid mt-3" id="list">
+  <div class="card border-0 rounded-0 shadow-sm w-100">
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center flex-wrap">
+      <h5 class="mb-0">Detail Stream : <%= Stream.name %> [<%= Stream.location %>]</h5>
+    </div>
+     
+        <div class="table-responsive mt-3" id="table-container">
+          <table class="table table-striped table-bordered mb-0 datatable">
+            <thead class="bg-primary mt-3">
+              <tr>
+                <th class="text-center">No</th>
+                <th class="text-center">Group Id</th>
+                <th class="text-center">Nama Group</th>
+                <th class="text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% Stream.groups.forEach((group, index) => { %>
+              <tr>
+
+                <td class="text-center"><%= index + 1 %></td>
+                <td class="text-center"><%= group._id %></td>
+                <td class="text-center"><%= group.name %></td>
+                <td class="text-center">
+                     <form action="/view/group/delete/<%= Stream._id %>" method="POST">  
+                    <a href="/camera/<%= group._id %>" class="btn btn-primary badge">
+                    <i class="bi bi-info-circle"></i> Detail</a> 
+                  <input type="hidden" name="groupId" value="<%= group._id %>">
+                        <button type="submit" class="btn btn-danger badge"><i class="bi bi-trash"></i>Delete</button>
+                    </form>      
+                </td>
+                
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>

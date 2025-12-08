@@ -1,0 +1,145 @@
+@import url("https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@600&display=swap");
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background: #484646;         /* background dark */
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 100vh;
+
+  /* CARD LOGIN */
+.center {
+  background: #1a1a1a;            /* warna dark */
+  padding: 40px 35px;
+  border-radius: 16px;
+  width: 370px;
+  box-shadow: 0 8px 25px rgba(245, 239, 239, 0.4);
+  border: 1px solid rgba(180, 173, 173, 0.08);
+}
+
+/* JUDUL LOGIN */
+.center h1 {
+  text-align: center;
+  margin-bottom: 60px;
+  color: #f5f5f5;
+  font-weight: 600;
+}
+
+  /* Gradient + gambar background */
+ 
+  background: linear-gradient(45deg, rgba(54, 55, 52, 0.7), rgba(54, 55, 55, 0.7)),
+  url("/img/drone-dji.png");
+
+  background-size: cover;        /* gambar menyesuaikan layar */
+  background-position: center;   /* fokus tengah */
+  background-repeat: no-repeat;  /* biar tidak terulang */
+
+  font-family: "Sansita Swashed", cursive;
+  padding-left: 10px;
+
+}
+.center { 
+  position: relative;
+  padding: 50px 50px;
+  background: #676363;
+  border-radius: 10px;
+  margin-top: 50px;      /* jarak atas */
+  margin-bottom: 50px;   /* jarak bawah */
+  margin-right: 10px;
+}
+.center h1 {
+  font-size: 2em;
+  border-left: 5px solid rgb(18, 18, 19);
+  padding: 10px 0 10px 15px; /* kiri tetap, kanan nol */
+  color: #000;
+  letter-spacing: 20px;
+  margin-bottom: 40px;
+  font-weight: bold;
+  width: 300px;         /* sama seperti inputbox */
+  margin: 0 auto 40px;  /* center + jarak bawah */
+  display: block;       /* memastikan width berlaku */
+}
+
+.center .inputbox {
+  position: relative;
+  width: 300px;
+  height: 30px;
+  margin-bottom: 50px;
+  letter-spacing: 5px;
+}
+.center .inputbox input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  border: 2px solid #f7f3f3;
+  outline: none;
+  background: none;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 1.2em;
+  color: #f5f5f5;
+}
+.center .inputbox:last-child {
+  margin-bottom: 0;
+}
+.center .inputbox span {
+  position: absolute;
+  top: 14px;
+  left: 20px;
+  font-size: 1em;
+  transition: 0.6s;
+  font-family: sans-serif;
+}
+.center .inputbox input:focus ~ span,
+.center .inputbox input:valid ~ span {
+  transform: translateX(-13px) translateY(-35px);
+  font-size: 1em;
+}
+.center .inputbox [type="button"] {
+  width: 50%;
+  background: dodgerblue;
+  color: #fff;
+  border: #fff;
+}
+.center .inputbox:hover [type="button"] {
+  background: linear-gradient(45deg, rgb(109, 133, 73), dodgerblue);
+}
+
+.center .inputbox button {
+  width: 50%;
+  margin: 0 auto;             /* tombol jadi di tengah */
+  display: block;             /* agar center bekerja */
+  padding: 10px;
+  letter-spacing: 5px;
+}
+
+.center .links {
+  text-align: center;
+  margin-top: 20px;
+  letter-spacing: 5px;
+}
+
+.center .links a {
+  display: block;
+  color: dodgerblue;
+  text-decoration: none;
+  margin-top: 5px;
+  font-size: 0.9em;
+}
+
+.center .links a:hover {
+  text-decoration: underline;
+}
+
+/* LABEL FLOATING */
+.inputbox span {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  color: #aaa;
+  pointer-events: none;
+  transition: 0.3s;
+}

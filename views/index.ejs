@@ -1,0 +1,19 @@
+<!-- <h2 class="text-center">Monitoring CCTV</h2> -->
+<div class="grid mt-4">
+    <!-- Tombol opsional -->
+</div>
+
+<% if (cameras.length < 1) { %>
+
+    <h2 class="text-center text-muted"> Streaming Not Found
+        <img src="/img/drone-bg-white.png" class="img-offline text-muted">
+    </h2>
+
+<% } else { %>
+
+    <!-- GRID -->
+    <div id="grid" class="grid mt-3"></div>
+  <!-- Script HARUS di luar grid -->
+    <script src="/js/group.js"></script>
+
+<% } %>

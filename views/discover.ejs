@@ -1,0 +1,46 @@
+<body class="bg-light">
+  <div class="container mt-3">
+    <h3 class="mb-4 text-center">📷 Daftar Kamera ONVIF</h3>
+
+    <!-- Tabel Kamera -->
+    <table class="table table-striped">
+      <thead class="table-dark">
+        <tr>
+          <th class="text-center">No</th>
+          <th class="text-center">Nama</th>
+          <th class="text-center">IP Address</th>
+          <th class="text-center">Serial Number</th>
+          <th class="text-center" colspan="2">Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="cameraTable">
+        <% if (cameras.length === 0) { %>
+        <tr>
+          <td colspan="7" class="text-center">Camera tidak ditemukan</td>
+        </tr>
+        <% } else { %>
+        <% cameras.forEach((cam, i) => { %>
+        <tr>
+          <td class="text-center"><%= i + 1 %></td>
+          <td class="text-center"><%= cam.name %></td>
+          <td class="text-center"><%= cam.ip %></td>
+          <td class="text-center"><%= cam.serialNumber %></td>
+          <td class="text-center">
+            <a href="/camera/add/<%= cam.id %>" class="btn btn-primary badge">Add To List</a>
+          </td>
+          <td class="text-center">
+            <a href="/live" class="btn btn-primary badge">View Stream</a>
+          </td>
+        </tr>
+        <% }) %>
+        <% } %>
+      </tbody>
+    </table>
+
+    <!-- Tombol Scan dan Progress -->
+    <div class="text-center mt-4">
+        <a href="/list" class="btn btn-primary badge">&laquo; Kembali</a>
+    </div>
+
+
+  

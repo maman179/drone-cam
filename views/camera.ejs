@@ -1,0 +1,154 @@
+ <% if (cameras.length < 1) { %>
+        <div id ="no-camera" class="p-4 text-center">
+          <h2 class="text-muted">Cameras Not Found<img src="/img/drone-bg-white.png" class="img-offline"></h4>
+        </div>
+      <% } else { %>
+<div class="container-fluid mt-3" id="list">
+  <div class="card border-0 rounded-0 shadow-sm w-100">
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center flex-wrap">
+      <h5 class="mb-0">List Onvif Cameras</h5>
+      <div class="mt-2 mt-sm-0">
+        <a class="btn btn-success btn-sm" href="/camera/add-manual">
+          <i class="bi bi-patch-plus"></i> Add Manual RTSP
+        </a>
+        <a class="btn btn-primary btn-sm" href="/scan" id="btnScan">
+          <i class="bi bi-search"></i> Scan Camera
+        </a>
+      </div>
+    </div>
+    
+    <div class="card-body">
+      <% if (msg.length !== 0) { %>
+        <script>
+          Swal.fire({
+            icon: 'info',
+            title: 'Complete!',
+            text: '<%= msg %>',
+            customClass: {
+                popup: 'swal-mini',
+                title: 'swal-title-mini',
+                htmlContainer: 'swal-text-mini',
+                icon: 'swal-icon-mini'
+              },
+            timer: 2000,
+            showConfirmButton: false
+          });
+        </script>
+      <% } %>
+      
+      <% if (error.length !== 0) { %>
+        <script>
+          Swal.fire({
+            icon: 'error',
+            title: 'Gagal!',
+            text: '<%= error %>',
+            customClass: {
+               popup: 'swal-small'
+            },
+            timer: 2000,
+            showConfirmButton: false
+          });
+        </script>
+      <% } %>
+     
+        <div class="table-responsive mt-3" id="table-container">
+          <table class="table table-striped table-bordered mb-0 datatable">
+            <thead class="bg-primary mt-3">
+              <tr>
+                <th class="text-center">No</th>
+                <th class="text-center">Nama Camera</th>
+                <th class="text-center">IP Address</th>
+                <th class="text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% cameras.forEach((cam, index) => { %>
+              <tr>
+                <% if (session && session.user) { %>
+                <input type="hidden" name="username" value=<%= session.user.username %>> 
+                <% } %>
+                <td class="text-center"><%= index + 1 %></td>
+                <td class="text-center"><%= cam.name %></td>
+                <td class="text-center"><%= cam.ip %></td>
+                <td class="text-center">
+                  <a href="/camera/<%= cam.id %>" class="btn btn-primary badge">
+                    <i class="bi bi-info-circle"></i> Detail
+                  </a>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+<div id="progress-container" class="mt-4" style="display:none;">
+  <div class="loading-center">
+    <p class="text-center fs-5"><img src="img/loading.gif"> </p>
+    <p class="text-center fs-3 text-muted">Scanning on process </p>
+  </div>
+</div>
+<!-- Script progress scanning -->
+<script>
+const btnScan = document.getElementById("btnScan");
+const progressBar = document.getElementById("progress-bar");
+const progressContainer = document.getElementById("progress-container");
+const tableContainer = document.getElementById("table-container");
+const noCamera = document.getElementById("list");
+
+let intervalId = null;
+
+btnScan.addEventListener("click", async () => {
+
+  btnScan.disabled = true;
+  btnScan.textContent = "🔄 Scanning...";
+
+  // hide table & no-camera
+  if (tableContainer) tableContainer.style.display = "none";
+  if (noCamera) noCamera.style.display = "none";
+
+  // show progress
+  progressContainer.style.display = "block";
+
+  progressBar.style.width = "0%";
+  progressBar.textContent = "0%";
+
+  // mulai scan
+  const res = await fetch("/scan-start");
+  const data = await res.json();
+
+  if (data.status === "busy") {
+    alert("⚠️ Proses scan sedang berjalan...");
+    btnScan.disabled = false;
+    btnScan.textContent = "🔍 Scan Camera";
+    progressContainer.style.display = "none";
+
+    if (tableContainer) tableContainer.style.display = "block";
+    if (noCamera) noCamera.style.display = "block";
+    return;
+  }
+
+  // polling status scan
+  intervalId = setInterval(async () => {
+    const statusRes = await fetch("/scan-status");
+    const status = await statusRes.json();
+
+    // jika scan selesai
+    if (!status.scanning) {
+      progressBar.style.width = "100%";
+      progressBar.textContent = "100%";
+
+      clearInterval(intervalId);
+      setTimeout(() => { window.location.reload(); }, 800);
+      return;
+    }
+
+    // jika scan berjalan → update progress bar
+    progressBar.style.width = status.progress + "%";
+    progressBar.textContent = status.progress + "%";
+
+  }, 1000);
+});
+</script>

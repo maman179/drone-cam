@@ -1,0 +1,118 @@
+<div class="container mt-4">
+
+  <h2 class="mb-4 fw-bold text-white">Detail Kamera</h2>
+
+  <% if (!camera) { %>
+     <div class="col-12 text-center">
+        <img src="/img/drone-bg.png" width="250">
+        <p class="text-muted mt-2">Cameras Not Found</p>
+      </div>
+  <% } else { %>
+
+  <div class="card shadow-lg border-0 rounded-4 p-3 bg-dark text-light" style="max-width: 420px;">
+    <div class="card-body">
+
+      <h5 class="fw-bold mb-3"><i class="bi bi-camera-video me-2"></i><%= camera.name %></h5>
+
+      <div class="mb-3">
+        <p class="text-secondary small mb-1">RTSP Video</p>
+        <div class="bg-black bg-opacity-50 p-2 rounded small text-info"><%= camera.rtsp %></div>
+      </div>
+
+      <div class="mb-3">
+        <p class="text-secondary small mb-1">RTSP Stream</p>
+        <div class="bg-black bg-opacity-50 p-2 rounded small text-info"><%= camera.rtsp1 %></div>
+      </div>
+
+      <div class="mb-3">
+        <p class="text-secondary small mb-1">Kamera Type</p>
+        <div class="bg-black bg-opacity-50 p-2 rounded small"><%= camera.serialNumber %></div>
+      </div>
+
+      <div class="mb-4">
+        <p class="text-secondary small mb-1">Firmware</p>
+        <div class="bg-black bg-opacity-50 p-2 rounded small"><%= camera.firmwareVersion %></div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <a href="/camera/edit/<%= camera.name %>" 
+           class="btn btn-info btn-sm flex-fill fw-bold">
+          <i class="bi bi-pencil-square"></i> Edit
+        </a>
+
+        <button class="btn btn-danger btn-sm flex-fill fw-bold"
+                onclick="deleteCamera('<%= camera.id %>')">
+          <i class="bi bi-trash"></i> Hapus
+        </button>
+      </div>
+
+      <a href="/list" class="d-block text-center text-secondary mt-3">
+        &laquo; Kembali
+      </a>
+
+    </div>
+  </div>
+
+  <% } %>
+
+</div>
+
+<style>
+  .card {
+    transition: 0.25s;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  }
+</style>
+
+<script>
+function deleteCamera(id) {
+  Swal.fire({
+    title: "Hapus Kamera?",
+    text: "Kamera ini akan dihapus permanen!",
+    icon: "warning",
+    background: "#1e1e1e",
+    color: "#fff",
+    backdrop: `
+      rgba(0,0,0,0.6)
+      left top
+      no-repeat
+    `,
+    showCancelButton: true,
+    confirmButtonColor: "#d9534f",
+    cancelButtonColor: "#0275d8",
+    confirmButtonText: "Ya, hapus!",
+    cancelButtonText: "Batal"
+  }).then(result => {
+    if (!result.isConfirmed) return;
+
+    fetch(`/camera/${id}`, {
+      method: "DELETE",
+      credentials: "include"
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+
+        Swal.fire({
+          icon: "success",
+          title: "Terhapus!",
+          text: "Kamera berhasil dihapus",
+          timer: 1500,
+          background: "#111",
+          color: "#fff",
+          showConfirmButton: false
+        });
+
+        setTimeout(() => location.href = "/list", 800);
+
+      } else {
+        Swal.fire("Error", data.error || "Gagal menghapus kamera", "error");
+      }
+    });
+  });
+}
+</script>
+

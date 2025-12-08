@@ -1,0 +1,56 @@
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-md-6">
+            <h2 class="text-center">Form Tambah Camera</h2>
+            <% if (typeof errors !='undefined') { %>
+             <div class="alert alert-danger" role="alert">
+                    <ul>
+                        <% errors.forEach(error => { %>
+                            <li><%= error.msg %></li>
+                        <% }) %>
+                    </ul>
+            </div>
+            <% }  %> 
+                
+<form method="post" action="/camera">
+  <div class="mb-3">
+    <input type="hidden" class="form-control" id="id"  name="id" value="<%= camera.id %>" required>
+    <label for="nama" class="form-label">Masukan Nama Camera</label>
+    <input type="text" class="form-control" id="name"  name="name" value="<%= camera.name %>" required>
+    <input type="hidden" class="form-control" id="protocol"  name="protocol" value="<%= camera.rtspPreviewParsed.protocol %>" required>
+    <input type="hidden" class="form-control" id="port"  name="port" value="<%= camera.rtspPreviewParsed.port %>" required>
+    <input type="hidden" class="form-control" id="preview"  name="preview" value="<%= camera.rtspPreviewParsed.path %>" required>
+    <input type="hidden" class="form-control" id="preview"  name="rec" value="<%= camera.rtspRecordParsed.path %>" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="nama" class="form-label">Masukan IP Camera</label>
+    <input type="text" class="form-control" id="ip"  name="ip" value="<%= camera.ip %>" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="nama" class="form-label">Serial Number</label>
+    <input type="text" class="form-control" id="SerialNumber"  name="SerialNumber" value="<%= camera.serialNumber %>" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="nama" class="form-label">Version</label>
+    <input type="text" class="form-control" id="FirmwareVersion"  name="FirmwareVersion" value="<%= camera.firmwareVersion %>" required>
+  </div>
+  
+  <div class="mb-3">
+    <label for="nama" class="form-label">User Name</label>
+    <input type="text" class="form-control" id="username"  name="username" value="admin" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="nama" class="form-label">Password</label>
+    <input type="password" class="form-control" id="password"  name="password" value="admin123" required>
+  </div>
+
+  <button type="submit" class="btn btn-success">Save</button>
+  <a href = "/" class="btn btn-danger">Cancel</a>
+</form>
+        </div>
+    </div>
+</div>

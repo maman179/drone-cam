@@ -1,0 +1,55 @@
+    
+<% if (error.length !== 0) { %>
+        <script>
+          Swal.fire({
+            icon: 'error',
+            title: 'Gagal!',
+            text: '<%= error %>',
+            customClass: {
+               popup: 'swal-small'
+            },
+            timer: 2000,
+            showConfirmButton: false
+          });
+        </script>
+      <% } %>
+
+      <% if (msg.length !== 0) { %>
+        <script>
+          Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: '<%= msg %>',
+            customClass: {
+               popup: 'swal-small'
+            },
+            timer: 2000,
+            showConfirmButton: false
+          });
+        </script>
+      <% } %>
+      
+<div class="center">
+  <h1 class= "center">Login</h1>
+  <form method="post" action="/login">
+    <div class="inputbox">
+      <input type="text" name="email" required="required">
+      <span>Email</span>
+    </div>
+    <div class="inputbox">
+      <input type="password" name="password" required="required">
+      <span>Password</span>
+    </div>
+
+    <div class="inputbox">
+      <button class="btn btn-outline-success btn-login">Login</button>
+    </div>
+
+    <!-- Tambahan di bawah login -->
+    <div class="links">
+      <a href="/register">Register akun</a>
+      <a href="/lupa-password">Lupa password?</a>
+    </div>
+
+  </form>
+</div>

@@ -1,0 +1,128 @@
+<%if (msg1 && msg1.length !== 0) { %>
+  <script>
+    Swal.fire({
+      icon: 'success',
+      title: 'Berhasil!',
+      text: '<%= msg1 %>',
+      html: `
+      <b>selamat datang, </b> <%= session.user.username %> <br>
+         `,
+      timer: 2000,
+      showConfirmButton: false
+    });
+  </script>
+<% } %>
+
+<% if (msg2 && msg2.length !== 0) { %>
+      <script>
+        Swal.fire({
+          icon: 'success',
+          title: 'Berhasil!',
+          html: `<%= msg2 %>`,
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      </script>
+    <% } %>
+    
+  <% if (streams.length < 1) { %>
+    <div class="text-center">
+      <h2 class="text-muted">Streaming not Found</h2>
+      <img src="/img/drone-bg-white.png" class="img-offline">
+    </div>
+  <% } else { %>
+
+  <div class="row g-3">
+    <% streams.forEach((stream) => { %>
+      <div class="col-md-4">
+        <div class="card shadow-sm rounded-3 border-0 hover-card">
+          <div class="card-body">
+
+            <!-- Nama Stream -->
+            <h5 class="fw-bold">Stream Name : <%= stream.name %></h5>
+
+            <!-- Lokasi -->
+            <p class="text-muted small mb-2">
+              <%= stream.location || "Tidak ada keterangan" %>
+            </p>
+
+            <!-- Jumlah Group -->
+            <span class="badge bg-info mb-2 text-muted">
+              <a href="/view/<%= stream._id %>" style="text-decoration:none;"> <%= stream.groups.length %> Groups</a>
+            </span>
+
+
+           <% 
+              let totalKamera = 0;
+              stream.groups.forEach(g => {
+                totalKamera += g.cameras.length;
+              });
+            %>
+
+             <!-- Jumlah Camera Group -->
+            <span class="badge bg-info mb-2 text-muted">
+              <a href="/list" style="text-decoration:none;"> <%= totalKamera %> Camera </a>
+            </span>
+
+      
+            <!-- Tombol Add Group-->
+            <a href="/stream/<%= stream._id %>/add-group" 
+               class="btn btn-outline-primary btn-sm mt-3 w-100">
+               Add Group
+            </a>
+            
+            <!-- Tombol Stream Group -->
+            <a href="/stream/<%= stream._id %>/preview" 
+               class="btn btn-outline-info btn-sm mt-3 w-100">
+               Preview
+            </a>
+
+            <button onclick="deleteStream('<%= stream._id %>')" 
+                class="btn btn-outline-danger btn-sm mt-3 w-100">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+
+  <% } %>
+</div>
+
+
+<script>
+function deleteStream(id) {
+  Swal.fire({
+    title: "Are You Sure?",
+    text: "This streaming will be permanently deleted",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d9534f",
+    cancelButtonColor: "#0275d8",
+    confirmButtonText: "Yes, delete!",
+    cancelButtonText: "Cancel"
+  }).then(result => {
+    if (!result.isConfirmed) return;
+
+    fetch(`/stream/${id}`, {
+      method: "DELETE",
+      credentials: "include"
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          timer: 1500,
+          showConfirmButton: false
+        });
+        setTimeout(() => location.reload(), 700);
+      } else {
+        Swal.fire("Error", data.error || "Gagal menghapus", "error");
+      }
+    });
+  });
+}
+</script>
