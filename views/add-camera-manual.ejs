@@ -1,5 +1,12 @@
-<div class="card bg-dark text-white shadow-lg rounded-3 p-4">
-  <div class="card-body">
+<div class="card bg-dark text-white shadow-lg rounded-3" style="max-width: 700px; margin:auto;">
+  
+  <!-- Card Header -->
+  <div class="card-header bg-primary text-white text-center py-3">
+    <h4 class="mb-0">Add Manual Camera</h4>
+  </div>
+
+  <!-- Card Body -->
+  <div class="card-body p-4 bg-dark-500">
 
     <% if (msg && msg.length !== 0) { %>
       <script>
@@ -22,10 +29,14 @@
           timer: 2500,
           showConfirmButton: false,
         });
-      </script>
+      
+      // Buka kembali modal setelah reload
+    document.addEventListener("DOMContentLoaded", function () {
+      var myModal = new bootstrap.Modal(document.getElementById('modalAddCamera'));
+      myModal.show();
+    });
+  </script>
     <% } %>
-
-    <h2 class="text-center mb-4">Form Tambah Camera</h2>
 
     <% if (typeof errors != 'undefined') { %>
       <script>
@@ -43,54 +54,64 @@
       </script>
     <% } %>
 
-    <form method="post" action="/camera/add">
+    <!-- FORM -->
+    <form method="post" action="/camera/add" class="container-fluid">
 
-      <div class="mb-3">
-        <label class="form-label">Nama Camera</label>
-        <input type="text" class="form-control bg-secondary text-white" name="name" required>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Nama Camera</label>
+          <input type="text" class="form-control" name="name" required>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">IP Address</label>
+          <input type="text" class="form-control" name="ip" required>
+        </div>
       </div>
 
-      <div class="mb-3">
-        <label class="form-label">IP Address</label>
-        <input type="text" class="form-control bg-secondary text-white" name="ip" required>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">PORT</label>
+          <input type="text" class="form-control" name="port" required>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">User Name</label>
+          <input type="text" class="form-control" name="username" placeholder="ex. admin">
+        </div>
       </div>
 
-      <div class="mb-3">
-        <label class="form-label">PORT</label>
-        <input type="text" class="form-control bg-secondary text-white" name="port" required>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Password</label>
+          <input type="text" class="form-control" name="password" placeholder="123456">
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Link Stream</label>
+          <select class="form-select" name="path_stream">
+            <option selected disabled>path Stream</option>
+            <option value="/tcp/av0_1">/tcp/av0_1</option>
+            <option value="/Stream/Channel">/Stream/Channel</option>
+          </select>
+        </div>
       </div>
 
-      <div class="mb-3">
-        <label class="form-label">User Name</label>
-        <input type="text" class="form-control bg-secondary text-white" name="username" value="admin">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Link Record</label>
+          <select class="form-select" name="path_rec">
+            <option selected disabled>path Record</option>
+            <option value="/tcp/av0_0">/tcp/av0_0</option>
+            <option value="/Stream/Channel">/Stream/Channel</option>
+          </select>
+        </div>
       </div>
 
-      <div class="mb-3">
-        <label class="form-label">Password</label>
-        <input type="text" class="form-control bg-secondary text-white" name="password" value="admin123">
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Link Stream</label>
-        <select class="form-select bg-secondary text-white" name="path_stream">
-          <option selected disabled>path Stream</option>
-          <option value="/tcp/av0_1">/tcp/av0_1</option>
-          <option value="/Stream/Channel">/Stream/Channel</option>
-        </select>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Link Record</label>
-        <select class="form-select bg-secondary text-white" name="path_rec">
-          <option selected disabled>path Record</option>
-          <option value="/tcp/av0_0">/tcp/av0_0</option>
-          <option value="/Stream/Channel">/Stream/Channel</option>
-        </select>
-      </div>
-
-      <button type="submit" class="btn btn-success w-100 mb-2">Save</button>
+      <button type="submit" class="btn btn-success w-100 mb-2 mt-2">Save</button>
       <a href="/list" class="btn btn-danger w-100">Cancel</a>
 
     </form>
+
   </div>
 </div>

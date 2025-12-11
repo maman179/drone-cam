@@ -206,3 +206,103 @@ canvas {
   background: #ffcccc;
   color: #800;
 }
+
+body.dark-mode {
+    background-color: #1e1e1e !important;
+    color: #eee !important;
+  }
+
+  .dark-mode .sidebar {
+    background: #111 !important;
+  }
+
+  .dark-mode .sidebar .nav-link {
+    color: #ccc !important;
+  }
+
+  .dark-mode .sidebar .nav-link:hover {
+    background: #222;
+  }
+
+  .dark-mode .navbar {
+    background: #222 !important;
+  }
+
+  .dark-mode .card {
+    background: #2a2a2a !important;
+    color: #eee;
+    border-color: #444;
+  }
+
+  .dark-mode .dropdown-menu {
+    background: #2d2d2d !important;
+    color: #eee;
+  }
+
+  /* === FIX DATATABLES AGAR TETAP LIGHT WALAU DARK MODE === */
+
+/* Wrapper utama */
+.dark-mode .dataTables_wrapper {
+  background: #ffffff !important;
+  color: #000 !important;
+  border-color: #ddd !important;
+}
+
+/* Table */
+.dark-mode table.dataTable {
+  background: #ffffff !important;
+  color: #000 !important;
+}
+
+.dark-mode table.dataTable th,
+.dark-mode table.dataTable td {
+  background: #ffffff !important;
+  color: #000 !important;
+  border-color: #ccc !important;
+}
+
+/* Header Tabel */
+.dark-mode table.dataTable thead th {
+  background: #f8f9fc !important; /* warna header light */
+  color: #000 !important;
+}
+
+/* Search, Dropdown Limit */
+.dark-mode .dataTables_wrapper select,
+.dark-mode .dataTables_wrapper input {
+  background: #ffffff !important;
+  color: #000 !important;
+  border: 1px solid #aaa !important;
+}
+
+/* Pagination */
+.dark-mode .dataTables_wrapper .dataTables_paginate {
+  background: #ffffff !important;
+}
+
+.dark-mode .dataTables_wrapper .paginate_button {
+  background: #ffffff !important;
+  color: #000 !important;
+  border: 1px solid #ccc !important;
+}
+
+.dark-mode .dataTables_wrapper .paginate_button.current {
+  background: #4e73df !important;
+  color: #fff !important;
+}
+
+/* Info text */
+.dark-mode .dataTables_info {
+  color: #000 !important;
+}
+
+/* Card / Box pembungkus tabel */
+.dark-mode .card,
+.dark-mode .card-body,
+.dark-mode .table-responsive,
+.dark-mode .dataTables_wrapper .row {
+  background: #ffffff !important;
+  color: #000 !important;
+}
+
+

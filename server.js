@@ -85,7 +85,7 @@ app.get("/", authRequired, async (req, res) => {
   });
 
     res.render("home.ejs", {
-      layout: "layouts/main-layouts.ejs",
+      layout: "layouts/admin-layouts.ejs",
       title: "Home",
       streams,
       user: req.session.user.username,
@@ -102,21 +102,6 @@ app.get("/", authRequired, async (req, res) => {
   }
 });
 
-
-// app.get('/home', authRequired, async(req, res) => {
-//  const groups = await Group.find({ userId: req.session.user.id })
-//   .populate("cameras"); // biar kamera ikut tampil
-//    res.render("home.ejs", {
-//     layout: "layouts/main-layouts.ejs",
-//     title: "Home",
-//     groups,
-//     user: req.session.user.username,
-//     msg: req.flash("msg")
-//   });
-//   console.log(groups);
-//   console.log("SESSION USER:", req.session.user);
-// })
-
 app.get("/live", authRequired, async (req, res) => {
   const cameras=await Camera.find({account : req.session.user.username});
   res.render('index.ejs', {
@@ -131,7 +116,7 @@ app.get('/list', authRequired, async (req, res) => {
    const cameras=await Camera.find({account : req.session.user.username});
   //  await refreshFfmpegStreams(globalWSS);
    res.render('camera.ejs',{
-     layout: 'layouts/main-layouts.ejs',
+     layout: 'layouts/admin-layouts.ejs',
      title:'Devices List',
      cameras,
      user: req.session.username, 
@@ -142,7 +127,7 @@ app.get('/list', authRequired, async (req, res) => {
 
 app.get('/videos', authRequired, (req, res) => { 
   res.render('video.ejs',{
-     layout: 'layouts/main-layouts.ejs',
+     layout: 'layouts/admin-layouts.ejs',
      title:'Directori Videos',
      user: req.session.username
   });
@@ -150,7 +135,7 @@ app.get('/videos', authRequired, (req, res) => {
 
 app.get('/about', authRequired, (req, res) => {
    res.render('about.ejs',{
-     layout: 'layouts/main-layouts.ejs',
+     layout: 'layouts/admin-layouts.ejs',
      title:'About Us',
      user: req.session.username
   });
@@ -712,7 +697,7 @@ app.get("/scan", async (req, res) => {
     const cameras=await Camera.find({account : req.session.user.username});
     await reloadFFmpeg();  
     res.render('camera.ejs', {
-      layout: 'layouts/main-layouts.ejs',
+      layout: 'layouts/admin-layouts.ejs',
       title: 'List Camera',
       msg: req.flash('msg'),
       error: req.flash('error'),
@@ -733,7 +718,7 @@ app.get("/scan-status", (req, res) => {
 app.get('/add-streaming', async(req, res) => {
  const cameras = await Camera.find({ account: req.session.user.username });
   res.render('add-streaming.ejs',{
-     layout: 'layouts/main-layouts.ejs',
+     layout: 'layouts/admin-layouts.ejs',
      title:'Add-Streaming',
      cameras,
      user: req.session.username,
@@ -805,7 +790,7 @@ app.get("/stream/:id/add-group", authRequired, async (req, res) => {
   res.render("streaming-detail.ejs", {
     stream,
     cameras,
-    layout: "layouts/main-layouts.ejs",
+    layout: "layouts/admin-layouts.ejs",
     title: "Tambah Group",
     msg: req.flash('msg2'),
   });
@@ -846,7 +831,7 @@ app.post("/stream/:id/add-group", authRequired, async (req, res) => {
 // End-point ADD Manual Camera
 app.get('/camera/add-manual', (req, res) => {
   res.render('add-camera-manual.ejs', {
-    layout: 'layouts/main-layouts.ejs',
+    layout: 'layouts/admin-layouts.ejs',
     title: 'Add Camera',
     msg: req.flash('msg'),
     error: req.flash('error')
@@ -876,7 +861,7 @@ app.post('/camera/add', [
   if(!errors.isEmpty()) {
     req.flash('error',"Camera Sudah ada");
     res.render('add-camera-manual.ejs', {
-      layout: 'layouts/main-layouts.ejs',
+      layout: 'layouts/admin-layouts.ejs',
       title: 'Add Camera',
       msg: req.flash('msg'),
       error: req.flash('error')
@@ -1080,7 +1065,7 @@ app.get("/stream/:streamId/preview", async (req, res) => {
 
     if (!stream) {
       return res.render("preview-stream", {
-        layout: "layouts/main-layouts",
+        layout: "layouts/admin-layouts",
         title: "Preview Stream",
         stream: null,
         error: "Stream tidak ditemukan"
@@ -1088,8 +1073,8 @@ app.get("/stream/:streamId/preview", async (req, res) => {
     }
 
     // 🔥 TIDAK reload ffmpeg di sini, biarkan 1 pipeline per kamera
-    res.render("preview-stream", {
-      layout: "layouts/main-layouts",
+    res.render("preview-stream.ejs", {
+      layout: "layouts/admin-layouts.ejs",
       title: "Preview Stream",
       stream,
       error: null
@@ -1105,7 +1090,7 @@ app.get("/stream/:streamId/preview", async (req, res) => {
 app.get("/view/:id", async (req, res) => {
   const Stream = await Streaming.findById(req.params.id);
   res.render("view-streaming", {
-        layout: "layouts/main-layouts",
+        layout: "layouts/admin-layouts",
         title: "Detail Group",
         Stream,
         msg: req.flash("msg")
@@ -1253,11 +1238,11 @@ app.get("/records/:user/:file", (req, res) => {
 });
 
 
-// halaman detail contact
+// halaman detail Camera
 app.get('/camera/:id', async(req, res) => {
   const camera= await Camera.findOne({ id : req.params.id })
    res.render('detail.ejs',{
-     layout: 'layouts/main-layouts.ejs',
+     layout: 'layouts/admin-layouts.ejs',
     title:'Detail Camera',
     camera
     });
