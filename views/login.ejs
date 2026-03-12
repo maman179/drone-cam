@@ -1,4 +1,17 @@
-    
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("expired") === "1") {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Session Habis',
+      text: 'Silakan login kembali',
+      timer: 1000,
+      showConfirmButton: false,
+    });
+  }
+</script>
+
 <% if (error.length !== 0) { %>
         <script>
           Swal.fire({

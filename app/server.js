@@ -5,13 +5,13 @@ import { spawn } from "child_process";
 import fs from "fs";
 import path from "path";
 import bcrypt from "bcrypt";
-import connectDB from "./utils/db.js";
-import Camera from "./model/cameras.js";
-import User from "./model/users.js";
-import Streaming from "./model/streamings.js";
-import Group from "./model/groups.js";
-import getNextSequence from "./helpers/getNextSequence.js";
-import { refreshFfmpegStreams } from "./helpers/ffmpegManagerX.js";
+import connectDB from "../utils/db.js";
+import Camera from "../model/cameras.js";
+import User from "../model/users.js";
+import Streaming from "../model/streamings.js";
+import Group from "../model/groups.js";
+import getNextSequence from "../helpers/getNextSequence.js";
+import { refreshFfmpegStreams } from "../helpers/ffmpegManagerX.js";
 import { fileURLToPath } from "url";
 import { WebSocketServer } from "ws";
 import expressLayouts from "express-ejs-layouts";
@@ -24,8 +24,64 @@ import flash from "connect-flash";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import dotenv from "dotenv";
-import streaming from "./model/streamings.js";
+import streaming from "../model/streamings.js";
 dotenv.config(); // load .env
+
+let mediamtxProcess;
+
+// ===============================
+// Generate mediamtx.yml otomatis
+// ===============================
+async function generateMediaMTX(){
+
+ const cams = await Camera.find()
+
+ let config = `webrtc: yes
+webrtcAddress: :8889
+
+paths:
+` 
+cams.forEach(cam => {
+
+  const id = `cam${cam.id}`   // convert number → string
+  config += `  
+  ${id}:
+    source: ${cam.rtsp}
+    sourceProtocol: tcp
+    sourceOnDemand: no
+    sourceOnDemandCloseAfter: 5s
+    sourceOnDemandStartTimeout: 10s
+  `
+ })
+
+ fs.writeFileSync("mediamtx.yml", config)
+ console.log("MediaMTX config generated")
+}
+// ===============================
+// Start MediaMTX
+// ===============================
+function startMediaMTX(){
+  mediamtxProcess = spawn("mediamtx.exe");
+  mediamtxProcess.stdout.on("data",data=>{
+    console.log("[MediaMTX]",data.toString());
+  });
+
+  mediamtxProcess.stderr.on("data",data=>{
+    console.log("[MediaMTX ERROR]",data.toString());
+  });
+}
+
+
+// ===============================
+// Restart MediaMTX
+// ===============================
+async function restartMediaMTX(){
+  if(mediamtxProcess){
+    mediamtxProcess.kill();
+  }
+  await generateMediaMTX();
+  startMediaMTX();
+}
 
 // 🔹 Inisialisasi Express
 const app = express();
@@ -34,14 +90,14 @@ const app = express();
 connectDB();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // Config flash message
 app.use(cookieParser("secret"));
 app.use(
   session({
     cookie: { 
-      maxAge: 1000 * 60 * 60,
+      maxAge: 1000*60*60,
       secure : false
    },
     secret: "secret",
@@ -69,10 +125,12 @@ app.set("layout", "layouts/main-layouts");
 
 // ====== AUTH MIDDLEWARE ======
 function authRequired(req, res, next) {
-  if (!req.session.user) 
-    return res.redirect("/login");
+  if (!req.session.user) {
+    return res.redirect("/login?expired=1");
+  }
   next();
 }
+
 
 //Route Home.ejs
 app.get("/", authRequired, async (req, res) => {
@@ -479,6 +537,10 @@ app.post("/login", async (req, res) => {
 };
   req.flash("msg1", `Selamat datang`, req.session.username);
   console.log("SESSION SET:", req.session);   // <-- CEK DISINI
+  await generateMediaMTX();
+
+  startMediaMTX();
+
   res.redirect("/");
 });
 
@@ -685,6 +747,9 @@ app.get("/scan", async (req, res) => {
           rtsp1: rtspPreview,
           account: account
         }).save();
+
+        // update config mediamtx
+        await restartMediaMTX();
 
         console.log(`✅ Simpan kamera baru: ${ipAddress}`);
       } catch (e) {
@@ -1259,11 +1324,14 @@ function getLocalIP() {
     }
   }
 // === START SERVER ===
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   const ip = getLocalIP();
   console.log(`🚀 Server running at:`);
   console.log(` -> http://localhost:${PORT}`);
   console.log(` -> http://${ip}:${PORT}  (🌐 akses dari HP dalam satu WiFi)`);
+
+  await generateMediaMTX();
+  await startMediaMTX();
 });
 
 }

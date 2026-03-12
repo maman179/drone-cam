@@ -26,9 +26,21 @@ async function init() {
         </div>
 
         <div class="canvas-wrap">
-          <canvas id="canvas-${cam.id}"></canvas>
-          <div class="loading-overlay" id="loading-${cam.id}">Loading video...</div>
-        </div>
+
+  <iframe 
+    id="frame-${cam.id}" 
+    src="" 
+    allow="autoplay; fullscreen"
+    style="width:100%; height:100%; border:none;">
+  </iframe>
+
+  <div class="loading-overlay" id="loading-${cam.id}">Loading video...</div>
+
+  <div class="rec-indicator" id="rec-${cam.id}" style="display:none;">
+    ● REC
+  </div>
+
+</div>
 
         <div class="actions">
           <button id="btn-preview-${cam.id}"><i class="bi bi-play-fill"></i> ON</button>
@@ -45,92 +57,87 @@ async function init() {
 }
 
 function setupCamera(cam) {
-  const canvas = document.getElementById(`canvas-${cam.id}`);
+
+  const frame  = document.getElementById(`frame-${cam.id}`);
   const loader = document.getElementById(`loading-${cam.id}`);
-  const ctx    = canvas.getContext("2d");
 
   const btnPreview = document.getElementById(`btn-preview-${cam.id}`);
   const btnStop    = document.getElementById(`btn-stop-${cam.id}`);
   const btnRec     = document.getElementById(`btn-rec-${cam.id}`);
   const btnStopRec = document.getElementById(`btn-stoprec-${cam.id}`);
 
-  let ws = null;
   let showREC = false;
-  let lastFrameTime = 0;
-  let recBlink = true;
-  let reconnectTimer = null;
+  const recIndicator = document.getElementById(`rec-${cam.id}`);
 
-  function startWS() {
-    if (ws) return;
+  function startCam() {
+
     loader.style.display = "flex";
-    ws = new WebSocket(`ws://${location.host}/stream/${cam.id}`);
-    ws.binaryType = "arraybuffer";
 
-    ws.onopen = () => {
-      btnPreview.disabled = true;
-      btnStop.disabled = false;
-      btnRec.disabled = false;
-      clearInterval(reconnectTimer);
-      reconnectTimer = null;
-    };
+    frame.src = `http://${location.hostname}:8889/cam${cam.id}`;
 
-    ws.onmessage = msg => {
-      lastFrameTime = Date.now();
+    setTimeout(()=>{
       loader.style.display = "none";
-      const blob = new Blob([msg.data], { type: "image/jpeg" });
-      createImageBitmap(blob).then(bmp => {
-        canvas.width = canvas.clientWidth;
-        canvas.height = canvas.clientHeight;
-        ctx.drawImage(bmp, 0, 0, canvas.width, canvas.height);
-        if (showREC && recBlink) {
-          ctx.font = "22px Arial";
-          ctx.fillText("🔴 REC", canvas.width - 90, 30);
-        }
-        bmp.close();
-      });
-    };
+    },2000);
 
-    ws.onclose = () => {
-      loader.style.display = "flex";
-      btnPreview.disabled = false;
-      btnStop.disabled = true;
-      btnRec.disabled = true;
-      btnStopRec.disabled = true;
-      ws = null;
-      if (!reconnectTimer) reconnectTimer = setInterval(startWS, 2000);
-    };
+    btnPreview.disabled = true;
+    btnStop.disabled = false;
   }
 
-  function stopWS() { ws?.close(); ws = null; }
+  function stopCam(){
 
-  btnPreview.addEventListener("click", startWS);
-  btnStop.addEventListener("click", stopWS);
+    frame.src = "";
+
+    btnPreview.disabled = false;
+    btnStop.disabled = true;
+
+  }
+
+  btnPreview.addEventListener("click", startCam);
+  btnStop.addEventListener("click", stopCam);
+
 
   btnRec.addEventListener("click", async () => {
-    await fetch(`/start-record/${cam.id}`);
-    showREC = true;
-    btnRec.disabled = true;
-    btnStopRec.disabled = false;
-    Swal.fire({ icon: "success", title: "Recording started", timer: 1000, showConfirmButton: false });
-  });
+  await fetch(`/start-record/${cam.id}`);
+  showREC = true;
+  if(recIndicator){
+    recIndicator.style.display = "flex";
+  }
+  btnRec.disabled = true;
+  btnStopRec.disabled = false;
+});
 
   btnStopRec.addEventListener("click", async () => {
-    await fetch(`/stop-record/${cam.id}`);
+  await fetch(`/stop-record/${cam.id}`);
+
     showREC = false;
-    btnRec.disabled = false;
-    btnStopRec.disabled = true;
-    Swal.fire({ icon: "info", title: "Recording stopped", timer: 1300, showConfirmButton: false });
+
+  if(recIndicator){
+    recIndicator.style.display = "none";
+  }
+  btnRec.disabled = false;
+  btnStopRec.disabled = true;
+    Swal.fire({
+      icon:"info",
+      title:"Recording stopped",
+      timer:1300,
+      showConfirmButton:false
+    });
+
   });
 
+}
   // kedip REC
   setInterval(() => { recBlink = !recBlink; }, 500);
 
   // detect offline
-  setInterval(() => {
-    if (!ws) return;
-    if (Date.now() - lastFrameTime > 3000) loader.style.display = "flex";
-  }, 1000);
-}
+  setInterval(()=>{
+  const frame = document.getElementById(`frame-${cam.id}`)
+  if(frame && frame.contentWindow.location.href === "about:blank"){
+    frame.src = `http://${location.hostname}:8889/cam${cam.id}`
+    }
+  },5000)
+
+  
 
 // init pertama kali
 init();

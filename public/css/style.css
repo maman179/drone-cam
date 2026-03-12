@@ -86,13 +86,19 @@ body {
 .canvas-wrap {
     position: relative;
     width: 100%;
-    max-width: 500px; /* untuk video agak lebih kecil dari card */
-    margin: 0 auto;
-    height: 180px;
+    aspect-ratio: 16 / 9;   /* rasio video */
     background: black;
     border-radius: 12px;
     overflow: hidden;
     border: 1px solid rgba(0,255,255,0.2);
+}
+
+.canvas-wrap iframe{
+    width:100%;
+    height:100%;
+    border:none;
+    display:block;
+    object-fit: cover;
 }
 
 canvas {
@@ -160,24 +166,22 @@ canvas {
 /* ==== BUTTON AREA ==== */
 .actions {
   display: flex;
+  flex-wrap: wrap;   /* penting */
   gap: 6px;
   margin-top: 12px;
   justify-content: center;
-  width: 100%;
-  max-width: 520px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .actions button {
   border: none;
-  padding: 6px 12px;
+  padding: 6px 10px;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: 0.2s;
-  min-width: 110px;
+  min-width: 80px;   /* sebelumnya 110px */
+  flex: 1 1 auto;
 }
 
 .actions button:hover:not(:disabled) {
@@ -206,6 +210,7 @@ canvas {
   background: #ffcccc;
   color: #800;
 }
+
 
 body.dark-mode {
     background-color: #1e1e1e !important;
