@@ -141,26 +141,42 @@ canvas {
 
 /* ==== REC INDICATOR ==== */
 .rec-indicator {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 12px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
+  position:absolute;
+  top:10px;
+  right:10px;
+  left: auto;
+
+  background:rgba(0,0,0,0.7);
+  color:white;
+  
+  padding:4px 10px;
+  border-radius:6px;
+
+  font-size:12px;
+  font-weight:600;  
+  
+  display:inline-flex;
+  align-items:center;
   gap: 6px;
-  padding: 5px 10px;
-  border-radius: 20px;
-  background: rgba(255,0,0,0.15);
-  border: 1px solid rgba(255,0,0,0.35);
-  color: #f66;
-  box-shadow: 0 0 10px #f00, inset 0 0 4px #f00;
-  animation: recPulse 1.3s infinite alternate;
+
+  width:fit-content;          /* supaya tidak panjang */
+  max-width: max-content;        /* supaya tidak melebar */
 }
 
-@keyframes recPulse {
-  0% { opacity: 0.6; transform: scale(0.95) }
-  100% { opacity: 1; transform: scale(1.05) }
+.rec-indicator::before{
+  content:"";
+  width:8px;
+  height:8px;
+  background:#ff0000;
+  border-radius:50%;
+  display:inline-block;
+  animation:blinkLive 1s infinite;
+}
+
+@keyframes blinkLive{
+  0%{opacity:1}
+  50%{opacity:0.3}
+  100%{opacity:1}
 }
 
 /* ==== BUTTON AREA ==== */
@@ -210,7 +226,6 @@ canvas {
   background: #ffcccc;
   color: #800;
 }
-
 
 body.dark-mode {
     background-color: #1e1e1e !important;
@@ -310,4 +325,42 @@ body.dark-mode {
   color: #000 !important;
 }
 
+.live-indicator{
+  position:absolute;
+  top:10px;
+  right:10px;
+  left: auto;
 
+  background:rgba(0,0,0,0.7);
+  color:white;
+  
+  padding:4px 10px;
+  border-radius:6px;
+
+  font-size:12px;
+  font-weight:600;  
+  
+  display:inline-flex;
+  align-items:center;
+  gap: 6px;
+
+  width:fit-content;          /* supaya tidak panjang */
+  max-width: max-content;        /* supaya tidak melebar */
+  /* box-shadow:0 0 2px 6px rgba(0,0,0,0.5); */
+}
+
+.live-indicator::before{
+  content:"";
+  width:8px;
+  height:8px;
+  background:#00ff4c;
+  border-radius:50%;
+  display:inline-block;
+  animation:blinkLive 1s infinite;
+}
+
+@keyframes blinkLive{
+  0%{opacity:1}
+  50%{opacity:0.3}
+  100%{opacity:1}
+}

@@ -1,3 +1,4 @@
+import axios from "axios";
 import express from "express";
 import Swal from "sweetalert2";
 import mongoose from "mongoose";
@@ -28,6 +29,8 @@ import streaming from "../model/streamings.js";
 dotenv.config(); // load .env
 
 let mediamtxProcess;
+let espStatus = {}; 
+const BLYNK_TOKEN = "TMPL68VIIqjYC";
 
 // ===============================
 // Generate mediamtx.yml otomatis
@@ -54,14 +57,19 @@ cams.forEach(cam => {
   `
  })
 
- fs.writeFileSync("mediamtx.yml", config)
- console.log("MediaMTX config generated")
+ fs.writeFileSync(path.join(__dirname, "mediamtx.yml"), config);
+ console.log("Write to:", path.join(__dirname, "mediamtx.yml"));
 }
+
 // ===============================
 // Start MediaMTX
 // ===============================
+
 function startMediaMTX(){
-  mediamtxProcess = spawn("mediamtx.exe");
+  const configPath = path.join(__dirname, "mediamtx.yml");
+
+  mediamtxProcess = spawn("mediamtx.exe", [configPath]);
+
   mediamtxProcess.stdout.on("data",data=>{
     console.log("[MediaMTX]",data.toString());
   });
@@ -71,15 +79,27 @@ function startMediaMTX(){
   });
 }
 
-
 // ===============================
 // Restart MediaMTX
 // ===============================
-async function restartMediaMTX(){
-  if(mediamtxProcess){
-    mediamtxProcess.kill();
+
+async function restartMediaMTX() {
+  if (mediamtxProcess) {
+    console.log("Stopping MediaMTX...");
+
+    await new Promise((resolve) => {
+      mediamtxProcess.on("exit", () => {
+        console.log("MediaMTX stopped");
+        resolve();
+      });
+
+      mediamtxProcess.kill("SIGINT"); // lebih halus dari kill biasa
+    });
   }
+
   await generateMediaMTX();
+
+  console.log("Starting MediaMTX...");
   startMediaMTX();
 }
 
@@ -150,7 +170,9 @@ app.get("/", authRequired, async (req, res) => {
       msg1: req.flash("msg1"),
       msg2: req.flash("msg2"),
     });
-
+    
+    await restartMediaMTX();
+    
     console.log("STREAMS:", streams);
     console.log("SESSION USER:", req.session.user);
 
@@ -159,6 +181,17 @@ app.get("/", authRequired, async (req, res) => {
     res.send("Internal server error");
   }
 });
+
+async function turnOffESP() {
+  try {
+    const res = await axios.get("http://10.20.88.187/off", {
+      timeout: 3000
+    });
+    console.log("ESP Response:", res.data);
+  } catch (err) {
+    console.error("Gagal kirim ke ESP:", err.message);
+  }
+}
 
 app.get("/live", authRequired, async (req, res) => {
   const cameras=await Camera.find({account : req.session.user.username});
@@ -426,11 +459,10 @@ app.get("/start-record/:id", async (req, res) => {
 
   const args = [
     "-rtsp_transport", "tcp",
-    "-i", cam.rtsp,
+    "-i", `rtsp://127.0.0.1:8554/cam${id}`,
     "-c:v", "copy",
     "-c:a", "aac",
     "-b:a", "128k",
-    "-movflags", "+faststart",
     "-y",
     filepath
   ];
@@ -441,8 +473,7 @@ app.get("/start-record/:id", async (req, res) => {
   recordMap[id] = { proc: rec, file: filename, filepath, user: user.username };
 
   rec.stderr.on("data", d => {
-    const line = d.toString();
-    if (line.includes("frame=")) console.log(`[ffmpeg ${id}] ${line.trim()}`);
+  console.log("[ffmpeg]", d.toString());
   });
 
   rec.on("close", (code, sig) => {
@@ -608,10 +639,9 @@ app.get('/logout', (req, res) => {
     }
     res.clearCookie('connect.sid'); // Hapus cookie session
     res.redirect('/login');
+    restartMediaMTX(); // Restart MediaMTX saat logout
   });
 });
-
-
 
 
 // ============================
@@ -628,9 +658,9 @@ app.get("/scan", async (req, res) => {
   scanProgress = 0;
   console.log("🔍 Memulai scan kamera ONVIF...");
 
-  const username = "admin";
-  const password = "admin123";
-
+  const username = "";
+  const password = "";
+  
   try {
     const existingCameras = await Camera.find();
     const foundDevices = [];
@@ -731,6 +761,7 @@ app.get("/scan", async (req, res) => {
         const rtspRecord = `rtsp://${username}:${password}@${ipAddress}:${port}${rec}`;
         const rtspPreview = `rtsp://${username}:${password}@${ipAddress}:${port}${stream}`;
         const account = req.session.user.username;
+        const ip_esp = "";
         const cameraId = await getNextSequence("cameraId");
         await new Camera({
           id: cameraId,
@@ -745,7 +776,8 @@ app.get("/scan", async (req, res) => {
           serialNumber: info.SerialNumber,
           rtsp: rtspRecord,
           rtsp1: rtspPreview,
-          account: account
+          ip_esp : ip_esp,
+          account: account,
         }).save();
 
         // update config mediamtx
@@ -780,6 +812,7 @@ app.get("/scan-status", (req, res) => {
   res.json({ scanning : true, progress: 35 });
 });
 
+// create Form Add Streaming
 app.get('/add-streaming', async(req, res) => {
  const cameras = await Camera.find({ account: req.session.user.username });
   res.render('add-streaming.ejs',{
@@ -791,20 +824,7 @@ app.get('/add-streaming', async(req, res) => {
   });
 })
 
-// app.post("/save-groups", async (req, res) => {
-//   const { name, description, cameras } = req.body;
-  
-//   const group = new Group({
-//     name,
-//     description,
-//     cameras: Array.isArray(cameras) ? cameras : [cameras],
-//     userId: req.session.user.id   // <- gunakan ID user dari session
-//   });
-
-//   await group.save();
-//   res.redirect("/");
-// });
-
+// proses tambah streaming
 app.post("/save-streaming", async (req, res) => {
   const { name, location, groups } = req.body;
 
@@ -845,7 +865,6 @@ app.delete("/stream/:id", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
-
 
 // tampil add-stream-group.ejs
 app.get("/stream/:id/add-group", authRequired, async (req, res) => {
@@ -1013,7 +1032,7 @@ app.post('/camera', [
 app.get('/camera/edit/:name', async (req,res)=>{
 const camera=await Camera.findOne({name : req.params.name});
   res.render('edit-camera.ejs',{
-    layout: 'layouts/main-layouts.ejs',
+    layout: 'layouts/admin-layouts.ejs',
     title:'Edit Data Camera',
     camera
   });
@@ -1041,13 +1060,13 @@ app.put('/camera/update',
   if(!errors.isEmpty()) {
     res.render('edit-camera.ejs', {
       title : 'Form Edit Data Camera',
-      layout: 'layouts/main-layouts.ejs',
+      layout: 'layouts/admin-layouts.ejs',
       errors: errors.array(),
       camera: req.body,
     });
   } else {
   try {
-    const { name, ip, port, username, password } = req.body;
+    const { name, ip, port, username, password, ip_esp } = req.body;
 
     // 🔹 Buat ulang RTSP otomatis
     const rtsp1 = `rtsp://${username}:${password}@${ip}:${port}/tcp/av0_1`;
@@ -1062,15 +1081,19 @@ app.put('/camera/update',
       password,
       rtsp,
       rtsp1,
-    });
-    await reloadFFmpeg();   
+      ip_esp
+    });    
+    
     req.flash("msg", "Data Kamera Berhasil Diperbarui!");
-    res.redirect("/live");
+    
+    res.redirect("/list");
+    await restartMediaMTX();
+    
   } catch (error) {
     req.flash("error", "Gagal update kamera: " + error.message);
     res.redirect("/live");
   }
-  }
+  }    
 });
 
 app.delete("/camera/:id", async (req, res) => {
@@ -1081,8 +1104,10 @@ app.delete("/camera/:id", async (req, res) => {
     if (result.deletedCount === 0) {
       return res.status(404).json({ error: "Camera not found" });
     }
-
+    
+    await restartMediaMTX();
     await reloadFFmpeg();
+
     res.json({ success: true, message: "Camera deleted" });
 
   } catch (err) {
@@ -1131,7 +1156,7 @@ app.get("/stream/:streamId/preview", async (req, res) => {
     if (!stream) {
       return res.render("preview-stream", {
         layout: "layouts/admin-layouts",
-        title: "Preview Stream",
+        title: "Live Stream",
         stream: null,
         error: "Stream tidak ditemukan"
       });
@@ -1312,6 +1337,60 @@ app.get('/camera/:id', async(req, res) => {
     camera
     });
 })
+
+app.get("/api/esp/on", async (req, res) => {
+  const { ip } = req.query;
+
+  try {
+    const response = await axios.get(`http://${ip}/on`);
+    espStatus[ip] = response.data == "1" ? "on" : "off";
+
+    res.json({ success: true });
+  } catch (err) {
+    res.json({ relay: "offline" });
+  }
+});
+
+app.get("/api/esp/off", async (req, res) => {
+  const { ip } = req.query;
+
+  try {
+    const response = await axios.get(`http://${ip}/off`);
+    espStatus[ip] = response.data == "0" ? "off" : "on";
+
+    res.json({ success: true });
+  } catch (err) {
+    res.json({ relay: "offline" });
+  }
+});
+
+app.get("/api/esp/status", async (req, res) => {
+  const { ip } = req.query;
+
+  try {
+    console.log("IP ESP:", ip);
+
+    const response = await axios.get(`http://${ip}/status`, {
+      timeout: 3000
+    });
+
+    console.log("STATUS:", response.data);
+
+    // langsung kirim ke frontend
+    res.json({
+      relay: response.data.relay,
+      source: "esp"
+    });
+
+  } catch (err) {
+    console.log("ERROR ESP:", err.message);
+
+    res.json({
+      relay: "offline"
+    });
+  }
+});
+
 
 // === Ambil IP Lokal ===
 function getLocalIP() {

@@ -35,16 +35,20 @@ const cameraSchema=new mongoose.Schema({
     },
     model: {
      type : String
-},
-  firmwareVersion:{ 
+    },
+    firmwareVersion:{ 
     type : String
-},
-  serialNumber : {
+    },
+    serialNumber : {
     type : String
- }, 
-  account : {
+    },
+    ip_esp : {
     type : String
- } 
+    }, 
+    account : {
+    type : String
+    }
+  
 });
 
 const Camera = mongoose.model('Camera', cameraSchema);
