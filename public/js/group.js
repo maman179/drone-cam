@@ -15,7 +15,6 @@ async function init() {
     card.innerHTML = `
       <div class="cam-card">
         <div class="cam-header">
-          <span class="badge bg-info text-dark">${cam.name}</span>
           <span class="esp-status" id="esp-status-${cam.id}">⚪ Unknown
         </div>
 
@@ -36,7 +35,7 @@ async function init() {
 
   <!-- LIVE indicator -->
   <div class="live-indicator" id="live-${cam.id}" style="display:none;">
-  📡 LANGSUNG
+  📡 LIVE - ${cam.name}
 </div>
 
 </div>

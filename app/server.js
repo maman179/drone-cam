@@ -652,8 +652,8 @@ let scanProgress = 0;
 
 app.get("/scan", async (req, res) => {
   if (scanning) 
-  return res.json({ status: "busy" });
-
+    return res.json({ status: "busy" });
+    
   scanning = true;
   scanProgress = 0;
   console.log("🔍 Memulai scan kamera ONVIF...");
@@ -1107,7 +1107,7 @@ app.delete("/camera/:id", async (req, res) => {
     
     await restartMediaMTX();
     await reloadFFmpeg();
-
+    req.flash("msg", "Kamera berhasil dihapus!");
     res.json({ success: true, message: "Camera deleted" });
 
   } catch (err) {
@@ -1225,39 +1225,6 @@ app.delete("/stream/:id", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
-
-
-// app.get("/api/cameras", async (req, res) => {
-//   if (!req.session.user) {
-//     return res.status(401).json({ error: "Unauthorized" });
-//   }
-//   const username = req.session.user.username;
-//   const cameras = await Camera.find({ account: username });
-//   res.json(cameras);
-// });
-
-// // cameras berdasarkan group
-// app.get("/api/cameras", async (req, res) => {
-//   if (!req.session.user) {
-//     return res.status(401).json({ error: "Unauthorized" });
-//   }
-
-//   const userId = req.session.user.id;
-
-//   // Ambil group milik user login & populate cameras
-//   const groups = await Group.find({ userId }).populate("cameras");
-
-//   let cameras = [];
-//   groups.forEach(g => {
-//     cameras.push(...g.cameras.map(cam => ({
-//       ...cam.toObject(),
-//       groupName: g.name // sisipkan nama group ke setiap kamera
-//     })));
-//   });
-
-//   res.json(cameras);
-// });
-
 
 // API Download Videos
 app.get("/download/:filename", (req, res) => {
